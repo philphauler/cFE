@@ -527,6 +527,12 @@ CFE_Status_t CFE_TBL_DumpCmd(const CFE_TBL_DumpCmd_t *data)
         {
             /* Complete the process */
             Status = CFE_TBL_PrepareDumpSnapshotBuffer(&Txn, DumpCtrlId, DumpFilename);
+            if (Status != CFE_SUCCESS)
+            {
+                /* The dump will not happen, so release the control block reserved above. */
+                /* The ID was just produced from a located block, so the lookup cannot fail. */
+                CFE_TBL_DumpCtrlBlockSetFree(CFE_TBL_LocateDumpCtrlByID(DumpCtrlId));
+            }
         }
 
         CFE_TBL_TxnFinish(&Txn);
