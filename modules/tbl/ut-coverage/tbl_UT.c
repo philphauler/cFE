@@ -1123,6 +1123,7 @@ void Test_CFE_TBL_DumpCmd(void)
 
     CFE_TBL_RegistryRec_t *RegRecPtr;
     CFE_TBL_LoadBuff_t    *LoadBuffPtr;
+    CFE_TBL_DumpControl_t *DumpCtrlPtr;
 
     UT_TBL_SetupSingleReg(&RegRecPtr, NULL, CFE_TBL_OPT_DEFAULT);
 
@@ -1192,6 +1193,10 @@ void Test_CFE_TBL_DumpCmd(void)
     RegRecPtr->Notify.Enabled = true;
     UtAssert_INT32_EQ(CFE_TBL_DumpCmd(&DumpCmd), CFE_SUCCESS);
     CFE_UtAssert_COUNTER_INCR(CFE_TBL_Global.CommandErrorCounter);
+    /* The control block reserved for this dump must be released again */
+    DumpCtrlPtr = CFE_TBL_LocateDumpCtrlByID(CFE_TBL_DUMPCTRLID_C(CFE_TBL_Global.LastDumpCtrlBlockId));
+    UtAssert_NOT_NULL(DumpCtrlPtr);
+    UtAssert_BOOL_FALSE(CFE_TBL_DumpCtrlBlockIsUsed(DumpCtrlPtr));
 
     /* Test with an active buffer, a pointer is created, the table is dump
      * only, and no dump fails to find a free dump control block; too many
